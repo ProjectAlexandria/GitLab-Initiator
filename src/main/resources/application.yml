@@ -1,0 +1,24 @@
+
+spring:
+  application:
+    name: "alexandria-gitlab-initiator"
+
+  cloud:
+    config:
+      enabled: "false"
+
+---
+spring:
+  cloud:
+    config:
+      enabled: "true"
+      fail-fast: "true"
+      retry:
+        maxAttempts: "10"
+        multiplier: "1.5"
+        initial-interval: "5000"
+        max-interval: "60000"
+  config:
+    activate:
+      on-profile: config-server
+    import: "configserver:"
