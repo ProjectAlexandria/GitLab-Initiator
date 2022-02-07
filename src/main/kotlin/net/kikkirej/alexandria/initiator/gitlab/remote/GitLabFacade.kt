@@ -6,6 +6,7 @@ import org.gitlab4j.api.models.Branch
 import org.gitlab4j.api.models.Group
 import org.gitlab4j.api.models.Project
 import org.springframework.stereotype.Service
+import java.util.stream.Collectors
 import java.util.stream.Stream
 
 @Service
@@ -20,9 +21,9 @@ class GitLabFacade {
         val projectsAndBranches = mutableMapOf<Project, List<Branch>>()
         getProjects(sourceConfig, gitlabApi)
             .forEach {project ->
-                val filter: Stream<Branch> = getBranches(gitlabApi, project.id)
+                projectsAndBranches[project] = getBranches(gitlabApi, project.id)
                     .filter { branch -> isSearchedBranch(sourceConfig, branch) }
-                projectsAndBranches[project] = filter.toList()
+                    .collect(Collectors.toList())
             }
         return projectsAndBranches
     }
