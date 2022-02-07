@@ -20,9 +20,9 @@ class GitLabFacade {
         val projectsAndBranches = mutableMapOf<Project, List<Branch>>()
         getProjects(sourceConfig, gitlabApi)
             .forEach {project ->
-                projectsAndBranches[project] = getBranches(gitlabApi, project.id)
-                    .filter {branch -> isSearchedBranch(sourceConfig, project.defaultBranch, branch)}
-                    .toList()
+                val filter: Stream<Branch> = getBranches(gitlabApi, project.id)
+                    .filter { branch -> isSearchedBranch(sourceConfig, branch) }
+                projectsAndBranches[project] = filter.toList()
             }
         return projectsAndBranches
     }
@@ -50,11 +50,11 @@ class GitLabFacade {
         return gitlabApi.repositoryApi.getBranches(projectId).stream()
     }
 
-    private fun isSearchedBranch(sourceConfig: GitLabSourceConfig, defaultBranch: String, branch: Branch): Boolean {
+    private fun isSearchedBranch(sourceConfig: GitLabSourceConfig, branch: Branch): Boolean {
         return if (sourceConfig.branchNamePattern == null) {
             true
         } else {
-            branch.name == defaultBranch ||  branch.name.matches(Regex(sourceConfig.branchNamePattern.toString()))
+            branch.default ||  branch.name.matches(Regex(sourceConfig.branchNamePattern.toString()))
         }
     }
 }
