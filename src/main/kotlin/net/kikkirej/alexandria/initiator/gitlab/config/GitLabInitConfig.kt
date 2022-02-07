@@ -14,10 +14,9 @@ class GitLabSourceConfig(
     var id: Long =-1,
     var name: String="dummy",
     var url: String = "https://gitlab.com/",
-    var organization: String?="dummy",
+    var groupId: String? = null,
     var accessUsername: String="dummy",
     var accessToken: String="dummy",
     var repositoryNamePattern: String? = null,
-    var groupId: String? = null,
     val branchNamePattern: String? = null,
 )

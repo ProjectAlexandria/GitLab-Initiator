@@ -17,7 +17,7 @@ class GitLabFacade {
 
     fun analyzingObjects(sourceConfig: GitLabSourceConfig): Map<Project, Collection<Branch>> {
         val gitlabApi = gitlabApiFor(sourceConfig)
-        val projectsAndBranches = mutableMapOf<Project, Collection<Branch>>()
+        val projectsAndBranches = mutableMapOf<Project, List<Branch>>()
         getProjects(sourceConfig, gitlabApi)
             .forEach {project ->
                 projectsAndBranches[project] = getBranches(gitlabApi, project.id)
