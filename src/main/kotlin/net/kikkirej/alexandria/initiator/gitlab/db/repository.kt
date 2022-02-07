@@ -5,12 +5,12 @@ import java.util.*
 
 interface SourceRepository : CrudRepository<Source, Long>
 
-interface ProjectRepository : CrudRepository<Project, Long>{
-    fun findByExternalIdentifierAndSource(externalIdentifier: String, source: Source): Optional<Project>
+interface ProjectRepository : CrudRepository<DBProject, Long>{
+    fun findByExternalIdentifierAndSource(externalIdentifier: String, source: Source): Optional<DBProject>
 }
 
 interface VersionRepository : CrudRepository<Version, Long> {
-    fun findByProjectAndName(project: Project, name: String) : Optional<Version>
+    fun findByProjectAndName(project: DBProject, name: String) : Optional<Version>
 }
 
 interface AnalysisRepository : CrudRepository<Analysis, Long>

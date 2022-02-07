@@ -32,14 +32,18 @@ class GitLabFacade {
             gitlabApi.projectApi.projectsStream
         } else {
             gitlabApi.groupApi.groupsStream
-                .map {group -> this.filterGroups(sourceConfig, group)}
+                .map {group -> this.filterGroups(sourceConfig, gitlabApi, group)}
                 .flatMap {i -> i}
         }
     }
 
-    private fun filterGroups(sourceConfig: GitLabSourceConfig, group: Group): Stream<Project> {
-        return group.projects.stream()
+    private fun filterGroups(sourceConfig: GitLabSourceConfig, gitlabApi: GitLabApi, group: Group): Stream<Project> {
+        val projectStream = group.projects.stream()
             .filter {project -> project.name?.matches(Regex(sourceConfig.repositoryNamePattern.toString())) ?: false}
+        val subGroupProjectStream = gitlabApi.groupApi.getSubGroupsStream(group)
+            .map {subGroup -> filterGroups(sourceConfig, gitlabApi, subGroup) }
+            .flatMap { i -> i }
+        return Stream.concat(projectStream, subGroupProjectStream)
     }
 
     private fun getBranches(gitlabApi: GitLabApi, projectId: Int): Stream<Branch> {

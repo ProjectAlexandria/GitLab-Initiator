@@ -9,11 +9,11 @@ class Source(@Id var id: Long,
              var type:String = "GitLab")
 
 @Entity(name = "project")
-class Project(@Id @GeneratedValue(strategy = GenerationType.SEQUENCE) var id: Long = 0,
-              @ManyToOne var source: Source,
-              var url:String?,
-              @Column(name = "external_identifier") var externalIdentifier: String,
-              @OneToMany(cascade = [CascadeType.ALL], mappedBy = "project") var metadata: MutableSet<ProjectMetadata> = mutableSetOf()
+class DBProject(@Id @GeneratedValue(strategy = GenerationType.SEQUENCE) var id: Long = 0,
+                @ManyToOne var source: Source,
+                var url:String?,
+                @Column(name = "external_identifier") var externalIdentifier: String,
+                @OneToMany(cascade = [CascadeType.ALL], mappedBy = "project") var metadata: MutableSet<ProjectMetadata> = mutableSetOf()
 )
 
 @Entity(name = "project_metadata")
@@ -21,14 +21,14 @@ class ProjectMetadata(@Id @GeneratedValue(strategy = GenerationType.SEQUENCE) va
                       var key:String,
                       var type:String,
                       var value:String,
-                      @ManyToOne var project: Project,
+                      @ManyToOne var project: DBProject,
 )
 
 @Entity(name = "version")
 class Version(@Id @GeneratedValue(strategy = GenerationType.SEQUENCE) var id: Long = 0,
               var default_version: Boolean = true, //in case of Filesystem there is only one "default"-version
               var name:String,
-              @ManyToOne var project: Project,
+              @ManyToOne var project: DBProject,
               @ManyToOne var latest_analysis: Analysis? = null,
               @OneToMany(cascade = [CascadeType.ALL], mappedBy = "version") var metadata: MutableSet<VersionMetadata> = mutableSetOf()
 )
