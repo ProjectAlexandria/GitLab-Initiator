@@ -1,5 +1,7 @@
 
 spring:
+  main:
+    web-application-type: none
   application:
     name: "alexandria-gitlab-initiator"
 
