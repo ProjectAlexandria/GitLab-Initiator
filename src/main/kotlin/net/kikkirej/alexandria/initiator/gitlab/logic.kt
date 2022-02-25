@@ -45,17 +45,17 @@ class GitLabInitiatorLogic(
         dbSource: Source,
         sourceConfig: GitLabSourceConfig
     ) {
-        for(repository in objectToAnalyze.keys){
-            log.info("Starting analysis for Repository $repository")
-            val dbProject = getDBProject(repository, dbSource)
-            val branches = objectToAnalyze[repository]
+        for(project in objectToAnalyze.keys){
+            log.info("Starting analysis for Repository $project")
+            val dbProject = getDBProject(project, dbSource)
+            val branches = objectToAnalyze[project]
             for(branch in branches!!){
                 log.info("Starting analysis for Branch $branch")
                 val version = getDBVersion(branch, dbProject)
                 val analysis = Analysis(version = version)
                 analysisRepository.save(analysis)
                 val filePath = getFilePath(analysis)
-                gitCloneService.clone(filePath, repository.httpUrlToRepo, version.name, sourceConfig)
+                gitCloneService.clone(filePath, project.httpUrlToRepo, version.name, sourceConfig)
                 camundaLayer.startProcess(project = dbProject, version= version, analysis= analysis, filePath)
             }
         }
@@ -74,7 +74,7 @@ class GitLabInitiatorLogic(
             version = versionOptional.get()
             version.default_version=branch.default
         }else{
-            version = Version(name = branch.name, project = dbProject)
+            version = Version(name = branch.name, project = dbProject, default_version = branch.default)
         }
 
         version.setMetadata("protected", branch.protected)
@@ -110,16 +110,16 @@ class GitLabInitiatorLogic(
         dbProject.setMetadata("fork", project.forkedFromProject)
         dbProject.setMetadata("archived", project.archived)
         dbProject.setMetadata("delete_branch_on_merge", project.removeSourceBranchAfterMerge)
-        dbProject.setMetadata("private", project.public.not())
+        dbProject.setMetadata("private", project.public?.not())
         dbProject.setMetadata("url", project.webUrl)
-        dbProject.setMetadata("owner_name", project.owner.name)
+        dbProject.setMetadata("owner_name", project.owner?.name)
         dbProject.setMetadata("has_wiki", project.wikiEnabled)
         dbProject.setMetadata("has_issues", project.issuesEnabled)
         dbProject.setMetadata("has_downloads", project.packagesEnabled)
-        dbProject.setMetadata("size", project.statistics.storageSize)
+        dbProject.setMetadata("size", project.statistics?.storageSize)
         dbProject.setMetadata("ssh_url", project.sshUrlToRepo)
         dbProject.setMetadata("star_count", project.starCount)
-        dbProject.setMetadata("visibility_name", project.visibility.name)
+        dbProject.setMetadata("visibility_name", project.visibility?.name)
         dbProject.setMetadata("open_issue_count", project.openIssuesCount)
         dbProject.setMetadata("pushed_at", project.lastActivityAt)
         projectRepository.save(dbProject)

@@ -1,4 +1,4 @@
-FROM openjdk:8 as build
+FROM openjdk:11 as build
 
 COPY mvnw .
 COPY .mvn .mvn
@@ -7,7 +7,7 @@ COPY src src
 
 RUN chmod +x ./mvnw && ./mvnw clean install
 
-FROM openjdk:8
+FROM openjdk:11
 
 ENV JAVA_OPTS='-Xmx128m' \
     HEALTHCHECK_URL=http://localhost:8080/actuator/health
